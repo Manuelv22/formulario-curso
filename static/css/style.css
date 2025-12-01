@@ -1,0 +1,76 @@
+:root{
+  --brand-blue:#0b4d82;
+  --brand-light:#2d7fb8;
+  --dark-gray:#33353a;
+}
+
+html, body {height: 100%;}
+body{display:flex;flex-direction:column;min-height:100vh;background:linear-gradient(180deg,#f7fbff, #ffffff);color:var(--dark-gray);}
+main{flex:1}
+.site-header .navbar-brand{font-weight:700}
+.hero{transition:transform .6s ease;}
+.hero:hover{transform:translateY(-6px)}
+.card{border:none}
+.btn-primary{background:var(--brand-blue);border:0}
+.btn-primary:hover{background:var(--brand-light)}
+
+/* WhatsApp prominent button */
+.btn-whatsapp{
+  --wa:#25D366;
+  color:#fff;
+  background:linear-gradient(180deg,var(--wa), #1fb859);
+  border:0;
+  box-shadow:0 6px 18px rgba(37,211,102,0.18);
+}
+.btn-whatsapp:hover{filter:brightness(.95);transform:translateY(-1px)}
+.btn-whatsapp:active{transform:translateY(0)}
+
+/* Card spacing and visual tweaks for the info/form area */
+.card{border:none;margin-bottom:1rem}
+/* keep default padding for shadow cards to avoid layout collapse */
+.card.shadow-sm{padding:initial}
+.info-card .card-body, .form-card .card-body{padding:1.25rem}
+
+@media(min-width:992px){
+  /* On large screens increase gap between columns */
+  #info .row{gap:0rem}
+}
+
+/* small animations (disabled by default to avoid hiding content) */
+.card-body{opacity:1;transform:none}
+
+@keyframes fadeUp{
+  to{opacity:1;transform:none}
+}
+
+/* responsive tweaks */
+@media(max-width:767px){
+  .hero{padding:2rem}
+}
+
+/* form focus */
+.form-control:focus{box-shadow:0 0 0 .2rem rgba(11,77,130,.12);border-color:var(--brand-blue)}
+
+/* Hero background image (uses static path). Place the image at static/img/2148975282.jpg */
+.hero.hero-bg{
+  color: #fff;
+  background-image: linear-gradient(135deg, rgba(11,77,130,0.85), rgba(45,127,184,0.6)), url('/static/img/2148975282.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+/* Ensure readability over image */
+.hero.hero-bg .lead, .hero.hero-bg .display-6 { text-shadow: 0 2px 6px rgba(0,0,0,0.35); }
+
+/* Field status icon */
+.field-status{width:42px;display:flex;align-items:center;justify-content:center;background:transparent;border-left:0}
+.field-status .bi{font-size:1.05rem;color:transparent}
+.is-valid + .field-status .bi, .field-status + .is-valid .bi{color: #198754}
+.is-invalid + .field-status .bi, .field-status + .is-invalid .bi{color: #dc3545}
+
+/* Adjust input-group so icon not causing overflow */
+.input-group .form-control{z-index:0}
+
+/* small green/red icons */
+.bi-check-circle-fill{color:#2d7fb8}
+.bi-x-circle-fill{color:#dc3545}

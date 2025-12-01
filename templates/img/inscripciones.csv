@@ -1,0 +1,4 @@
+id,nombre,apellido,identificacion,telefono,direccion,email,experiencia,mensaje,created_at
+3,Manuel,Varela,25167048,3028092784,santiago,m.varelav22@gmail.com,No,Prueba,2025-11-29T14:40:21.654484
+2,Prueba,Automatica,11111111-1,56912345678,Prueba 123,prueba@example.com,No,Envio de prueba desde script,2025-11-29T14:28:41.721645
+1,Prueba,Automatica,11111111-1,56912345678,Prueba 123,prueba@example.com,No,Envio de prueba desde script,2025-11-29T14:26:51.543642
