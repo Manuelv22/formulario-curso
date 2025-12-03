@@ -145,9 +145,16 @@ def index():
                 flash(e, "danger")
             return redirect(url_for("index") + "#formulario")
 
-        # Check duplicates (email or telefono)
+        # Check current registrations count and duplicates (email or telefono)
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
+        c.execute('SELECT COUNT(*) FROM registrations')
+        current_count = c.fetchone()[0] or 0
+        LIMIT = int(os.getenv('REGISTRATION_LIMIT', '30'))
+        if current_count >= LIMIT:
+            conn.close()
+            flash(f"Lo sentimos — ya se alcanzó el límite de {LIMIT} inscripciones. No se aceptan más.", "warning")
+            return redirect(url_for("index") + "#formulario")
         dup_msgs = []
         if email:
             c.execute("SELECT id FROM registrations WHERE lower(email)=lower(?) LIMIT 1", (email,))
@@ -165,8 +172,6 @@ def index():
             return redirect(url_for("index") + "#formulario")
 
         # All validations passed; insert into DB
-        conn = sqlite3.connect(DB_PATH)
-        c = conn.cursor()
         c.execute('''
             INSERT INTO registrations (nombre, apellido, identificacion, telefono, direccion, email, experiencia, mensaje, created_at)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -201,8 +206,14 @@ def index():
         flash("Gracias por inscribirte. Tu inscripción fue recibida.", "success")
         return redirect(url_for("index") + "#formulario")
 
-    # GET
-    return render_template("index.html")
+    # GET — fetch current count so the template can show status/disable form when full
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute('SELECT COUNT(*) FROM registrations')
+    current_count = c.fetchone()[0] or 0
+    conn.close()
+    LIMIT = int(os.getenv('REGISTRATION_LIMIT', '30'))
+    return render_template("index.html", registrations_count=current_count, registrations_limit=LIMIT)
 
 
 @app.route('/check-duplicate', methods=['GET'])

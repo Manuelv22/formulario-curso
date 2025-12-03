@@ -47,6 +47,14 @@
       <div class="card shadow-sm">
         <div class="card-body">
           <h3 class="mb-3">Formulario de inscripción</h3>
+          {% set remaining = registrations_limit - registrations_count %}
+          {% if registrations_count >= registrations_limit %}
+            <div class="alert alert-warning" role="alert">
+              Lo sentimos — ya se alcanzó el límite de {{ registrations_limit }} inscripciones. No se aceptan más inscripciones por ahora.
+            </div>
+            <p class="text-muted">Si quieres, contáctanos por WhatsApp para preguntar por lista de espera.</p>
+            <a class="btn btn-outline-primary" href="https://wa.me/56984575115?text=Consulta+sobre+lista+de+espera+curso+pa%C3%B1os+inmobiliarios">Contactar por WhatsApp</a>
+          {% else %}
           <div id="form-errors"></div>
           <form id="inscripcionForm" method="post" novalidate>
             <div class="row g-2">
@@ -82,7 +90,7 @@
                 </div>
                 <div class="invalid-feedback" id="err-telefono"></div>
               </div>
-              <div class="col-12">
+              <!--<div class="col-12">
                 <label class="form-label">Dirección</label>
                 <div class="input-group">
                   <input name="direccion" id="direccion" class="form-control" maxlength="200">
@@ -97,7 +105,7 @@
                   <span class="input-group-text field-status" id="status-email"><i class="bi"></i></span>
                 </div>
                 <div class="invalid-feedback" id="err-email"></div>
-              </div>
+              </div>-->
               <div class="col-md-6">
                 <label class="form-label">¿Tienes experiencia en paños inmobiliarios?</label>
                 <select name="experiencia" class="form-select">
@@ -119,6 +127,8 @@
               <button id="submitBtn" class="btn btn-primary btn-lg" type="submit">Enviar inscripción</button>
             </div>
           </form>
+          <div class="mt-3 text-muted">Quedan <strong>{{ remaining }}</strong> cupos disponibles.</div>
+          {% endif %}
         </div>
       </div>
       <!-- Contact (mobile) placed after the form on small screens -->
