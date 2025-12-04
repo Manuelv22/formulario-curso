@@ -19,15 +19,13 @@ document.addEventListener('DOMContentLoaded', function(){
   const validators = {
     nombre: v => /^[A-Za-zÀ-ÖØ-öø-ÿ '\-]{2,60}$/.test(v.trim()),
     apellido: v => /^[A-Za-zÀ-ÖØ-öø-ÿ '\-]{2,60}$/.test(v.trim()),
-    email: v => /^[^@\s]+@[^@\s]+\.[a-zA-Z]{2,}$/.test(v.trim()),
     telefono: v => { const d=v.replace(/[^0-9]/g,''); return d.length>=8 && d.length<=15 },
-    direccion: v => v.length <= 200,
     mensaje: v => v.length <= 1000
   };
 
   // Show errors inline per field
   function clearFieldErrors(){
-    ['nombre','apellido','identificacion','telefono','direccion','email','mensaje'].forEach(id => {
+    ['nombre','apellido','identificacion','telefono','mensaje'].forEach(id => {
       const el = document.getElementById(id);
       const err = document.getElementById('err-' + id);
       if (el) { el.classList.remove('is-invalid'); el.classList.remove('is-valid'); }
@@ -79,16 +77,12 @@ document.addEventListener('DOMContentLoaded', function(){
 
     const nombre = (data.get('nombre')||'').toString();
     const apellido = (data.get('apellido')||'').toString();
-    const email = (data.get('email')||'').toString();
     const telefono = (data.get('telefono')||'').toString();
-    const direccion = (data.get('direccion')||'').toString();
     const mensaje = (data.get('mensaje')||'').toString();
 
     if (!validators.nombre(nombre)) fieldErrors.nombre = ['Nombre inválido (2-60 letras).'];
     if (!validators.apellido(apellido)) fieldErrors.apellido = ['Apellido inválido (2-60 letras).'];
-    if (!validators.email(email)) fieldErrors.email = ['Correo electrónico inválido.'];
     if (!validators.telefono(telefono)) fieldErrors.telefono = ['Teléfono inválido (8-15 dígitos).'];
-    if (direccion.length > 200) fieldErrors.direccion = ['Dirección demasiado larga (máx. 200 caracteres).'];
     if (mensaje.length > 1000) fieldErrors.mensaje = ['Mensaje demasiado largo (máx. 1000 caracteres).'];
 
     if (Object.keys(fieldErrors).length){
@@ -97,33 +91,23 @@ document.addEventListener('DOMContentLoaded', function(){
       return false;
     }
 
-    // Before submitting, check duplicates on server
+    // Before submitting, check duplicates on server (only telefono now)
     e.preventDefault();
-    const emailVal = email;
     const telefonoVal = telefono;
-    fetch('/check-duplicate?email=' + encodeURIComponent(emailVal) + '&telefono=' + encodeURIComponent(telefonoVal))
+    fetch('/check-duplicate?telefono=' + encodeURIComponent(telefonoVal))
       .then(r => r.json())
       .then(json => {
         const dupMap = {};
-        if (json.exists_email) dupMap.email = ['Ya existe una inscripción con ese correo electrónico.'];
         if (json.exists_phone) dupMap.telefono = ['Ya existe una inscripción con ese teléfono.'];
         if (Object.keys(dupMap).length){
-          // Show duplicate modal instead of inline errors
           const msgs = [];
-          if (dupMap.email) msgs.push(dupMap.email.join(' '));
           if (dupMap.telefono) msgs.push(dupMap.telefono.join(' '));
-          // choose focus field priority: email first, then telefono
-          const focusField = dupMap.email ? 'email' : (dupMap.telefono ? 'telefono' : null);
-          showDupModal(msgs, focusField);
+          showDupModal(msgs, 'telefono');
           return;
         }
-        // No duplicates — submit the form normally
         form.submit();
       })
-      .catch(() => {
-        // If API fails, allow submit and rely on server-side checks
-        form.submit();
-      });
+      .catch(() => { form.submit(); });
     return false;
   });
 
@@ -140,24 +124,20 @@ document.addEventListener('DOMContentLoaded', function(){
   });
 
   // Also check duplicates on blur for immediate feedback
-  const emailInput = document.getElementById('email');
   const telefonoInput = document.getElementById('telefono');
   // doDupCheck accepts optional field key to focus afterwards ('email' or 'telefono')
   let dupFocusField = null;
   function doDupCheck(fieldKey){
-    const emailVal = (emailInput && emailInput.value) ? emailInput.value.trim() : '';
     const telefonoVal = (telefonoInput && telefonoInput.value) ? telefonoInput.value.trim() : '';
-    if (!emailVal && !telefonoVal) return;
-    fetch('/check-duplicate?email=' + encodeURIComponent(emailVal) + '&telefono=' + encodeURIComponent(telefonoVal))
+    if (!telefonoVal) return;
+    fetch('/check-duplicate?telefono=' + encodeURIComponent(telefonoVal))
       .then(r => r.json())
       .then(json => {
         const dupErrors = [];
-        if (json.exists_email) dupErrors.push('Ya existe una inscripción con ese correo electrónico.');
         if (json.exists_phone) dupErrors.push('Ya existe una inscripción con ese teléfono.');
         if (dupErrors.length) showDupModal(dupErrors, fieldKey);
       }).catch(()=>{});
   }
-  if (emailInput) emailInput.addEventListener('blur', function(){ doDupCheck('email'); });
   if (telefonoInput) telefonoInput.addEventListener('blur', function(){ doDupCheck('telefono'); });
 
   // character counter for mensaje

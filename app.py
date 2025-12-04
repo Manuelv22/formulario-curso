@@ -4,6 +4,8 @@ from email.message import EmailMessage
 import os
 import sqlite3
 from datetime import datetime
+import traceback
+import os
 import os
 import re
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -129,13 +131,14 @@ def index():
         elif not valid_phone(telefono):
             errors.append("Teléfono inválido. Use sólo números y opcionalmente '+', 8-15 dígitos.")
 
-        if not email:
-            errors.append("El correo electrónico es obligatorio.")
-        elif not valid_email(email):
-            errors.append("Correo electrónico inválido.")
+        # Email is optional in the public form (we keep field for admin/edit but public form may omit it)
+        # Validate only if provided
+        if email:
+            if not valid_email(email):
+                errors.append("Correo electrónico inválido.")
 
         # Length constraints
-        if len(direccion) > 200:
+        if direccion and len(direccion) > 200:
             errors.append("La dirección es demasiado larga (máx. 200 caracteres).")
         if len(mensaje) > 1000:
             errors.append("El mensaje es demasiado largo (máx. 1000 caracteres).")
@@ -342,10 +345,11 @@ def admin_edit(reg_id):
             errors.append('Apellido inválido. Sólo letras y espacios, 2-60 caracteres.')
         if telefono and not valid_phone(telefono):
             errors.append('Teléfono inválido. Use sólo números y opcionalmente "+", 8-15 dígitos.')
-        if not email or not valid_email(email):
+        # email is optional in admin edit; validate only if present
+        if email and not valid_email(email):
             errors.append('Correo electrónico inválido.')
-        if len(direccion) > 200:
-            errors.append('La dirección es demasiado larga (máx. 200 caracteres).')
+        if direccion and len(direccion) > 200:
+            errors.append('La dirección es demasiado larga (máx. 200 caracteres.)')
         if len(mensaje) > 1000:
             errors.append('El mensaje es demasiado largo (máx. 1000 caracteres).')
 
@@ -446,6 +450,23 @@ def admin_export():
     res = Response(output, mimetype='text/csv')
     res.headers['Content-Disposition'] = 'attachment; filename=inscripciones.csv'
     return res
+
+
+# Helpful debugging: capture full tracebacks for unhandled 500 errors into a file
+@app.errorhandler(500)
+def internal_server_error(e):
+    try:
+        tb = traceback.format_exc()
+    except Exception:
+        tb = 'traceback unavailable'
+    try:
+        with open(os.path.join(os.path.dirname(__file__), 'error_debug.log'), 'a', encoding='utf-8') as fh:
+            fh.write('----- ' + datetime.utcnow().isoformat() + ' -----\n')
+            fh.write(tb + '\n')
+    except Exception:
+        app.logger.exception('Failed to write error_debug.log')
+    app.logger.exception('Internal server error: %s', e)
+    return 'Internal Server Error', 500
 
 
 if __name__ == "__main__":

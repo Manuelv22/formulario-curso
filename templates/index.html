@@ -100,16 +100,14 @@
               <div class="col-12">
                 <label class="form-label">Dirección</label>
                 <div class="input-group">
-                  <input name="direccion" id="direccion" class="form-control" maxlength="200">
-                  <span class="input-group-text field-status" id="status-direccion"><i class="bi"></i></span>
+                  <!-- Dirección removed from public form per request -->
                 </div>
                 <div class="invalid-feedback" id="err-direccion"></div>
               </div>
               <div class="col-md-6">
                 <label class="form-label">Correo electrónico</label>
                 <div class="input-group">
-                  <input name="email" id="email" type="email" class="form-control" required maxlength="254">
-                  <span class="input-group-text field-status" id="status-email"><i class="bi"></i></span>
+                  <!-- Email removed from public form per request -->
                 </div>
                 <div class="invalid-feedback" id="err-email"></div>
               </div>
@@ -137,7 +135,7 @@
           {% if registrations_limit is not none %}
             <div class="mt-3 text-muted">Quedan <strong>{{ remaining }}</strong> cupos disponibles.</div>
           {% endif %}
-          {% endif %}
+          
         </div>
       </div>
       <!-- Contact (mobile) placed after the form on small screens -->
