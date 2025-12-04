@@ -16,3 +16,4 @@ registrations.db
 # Editor
 .vscode/
 .idea/
+error_debug.log

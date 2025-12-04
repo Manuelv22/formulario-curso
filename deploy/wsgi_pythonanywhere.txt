@@ -1,0 +1,54 @@
+WSGI snippets for PythonAnywhere
+
+Replace `tu_usuario` with your PythonAnywhere username (the one used in https://<tu_usuario>.pythonanywhere.com).
+
+1) Minimal WSGI (recommended when you set the Virtualenv path in the Web tab)
+
+# --------------------
+# Minimal WSGI (paste into the PythonAnywhere WSGI file)
+# --------------------
+import sys
+import os
+
+project_home = '/home/tu_usuario/Lading-formulario'
+if project_home not in sys.path:
+    sys.path.insert(0, project_home)
+
+# Optionally set environment variables here (NOT recommended for secrets)
+# os.environ['ENABLE_REGISTRATION_LIMIT'] = '0'
+
+# Import the WSGI application from app.py (app defines `application = app`)
+from app import application
+
+
+2) WSGI with explicit virtualenv activation (optional)
+
+# --------------------
+# Activate virtualenv explicitly (only if you prefer this over using the Web tab virtualenv field)
+# --------------------
+import sys
+import os
+
+project_home = '/home/tu_usuario/Lading-formulario'
+if project_home not in sys.path:
+    sys.path.insert(0, project_home)
+
+venv_path = '/home/tu_usuario/.virtualenvs/formulario-venv'
+activate_this = os.path.join(venv_path, 'bin', 'activate_this.py')
+if os.path.exists(activate_this):
+    with open(activate_this) as f:
+        code = compile(f.read(), activate_this, 'exec')
+        exec(code, dict(__file__=activate_this))
+
+from app import application
+
+
+3) Notes / quick checklist
+- In the PythonAnywhere "Web" tab set the Virtualenv path to:
+  /home/tu_usuario/.virtualenvs/formulario-venv
+- Set Static files mapping:
+  URL: /static/    Directory: /home/tu_usuario/Lading-formulario/static
+- Set Environment variables in the Web tab (do NOT hardcode secrets into this file): SECRET_KEY, SMTP_USER, SMTP_PASS, MAIL_TO, ENABLE_REGISTRATION_LIMIT, etc.
+- After updating code `git pull origin main` and then click "Reload" in the Web tab.
+
+Copy the appropriate snippet and replace `tu_usuario` with your PythonAnywhere username before saving.
