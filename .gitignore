@@ -9,6 +9,10 @@ __pycache__/
 # Database
 registrations.db
 
+# Local SSH keys accidentally placed in project root
+8520147
+8520147.pub
+
 # Editor
 .vscode/
 .idea/

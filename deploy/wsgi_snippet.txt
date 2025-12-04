@@ -1,0 +1,42 @@
+WSGI snippet for PythonAnywhere (ready to paste into the WSGI configuration file)
+
+Replace `yourusername` with `manuelvar22` if not already set by the deploy helper.
+
+----- BEGIN SNIPPET -----
+import sys
+import os
+
+# Project root (adjust if you put the project in a different folder)
+project_home = '/home/manuelvar22/Lading-formulario'
+if project_home not in sys.path:
+    sys.path.insert(0, project_home)
+
+# Optional: set a PYTHON_EGG_CACHE location used by some packages
+os.environ.setdefault('PYTHON_EGG_CACHE', '/home/manuelvar22/.python-eggs')
+
+# If you want to activate the virtualenv from the WSGI file (usually not
+# necessary if you set the Virtualenv path in the PythonAnywhere Web UI),
+# you can uncomment the lines below and adjust the path to the venv.
+# venv_activate = '/home/manuelvar22/Lading-formulario/.venv/bin/activate_this.py'
+# if os.path.exists(venv_activate):
+#     exec(open(venv_activate).read(), dict(__file__=venv_activate))
+
+# Import the WSGI application object from app.py
+# app.py exposes `application = app` so we import `application` here.
+from app import application
+
+----- END SNIPPET -----
+
+Instructions
+- Open the PythonAnywhere Dashboard -> Web -> WSGI configuration file.
+- Replace the existing contents with the snippet above (or merge the
+  `sys.path.insert` + `from app import application` portion into the file).
+- In the Web tab set the Virtualenv to: `/home/manuelvar22/Lading-formulario/.venv`
+- In Web -> Static files add mapping: `/static/` -> `/home/manuelvar22/Lading-formulario/static/`
+- Add Environment variables in Web -> Environment variables (SECRET_KEY, SMTP_*, etc.)
+- Reload the web app.
+
+Notes
+- Do NOT hardcode secrets in this file. Use Environment variables via the Web UI.
+- If you prefer the WSGI file not to activate the venv, leave the activation
+  lines commented and use the Virtualenv setting in the Web UI instead.
