@@ -150,8 +150,14 @@ def index():
         c = conn.cursor()
         c.execute('SELECT COUNT(*) FROM registrations')
         current_count = c.fetchone()[0] or 0
+        # Allow disabling the registration limit via environment variable
+        enable_limit = os.getenv('ENABLE_REGISTRATION_LIMIT', '1')
+        try:
+            enable_limit_bool = str(enable_limit).lower() not in ('0', 'false', 'no', 'off')
+        except Exception:
+            enable_limit_bool = True
         LIMIT = int(os.getenv('REGISTRATION_LIMIT', '30'))
-        if current_count >= LIMIT:
+        if enable_limit_bool and current_count >= LIMIT:
             conn.close()
             flash(f"Lo sentimos — ya se alcanzó el límite de {LIMIT} inscripciones. No se aceptan más.", "warning")
             return redirect(url_for("index") + "#formulario")
@@ -212,7 +218,10 @@ def index():
     c.execute('SELECT COUNT(*) FROM registrations')
     current_count = c.fetchone()[0] or 0
     conn.close()
-    LIMIT = int(os.getenv('REGISTRATION_LIMIT', '30'))
+    # If the limit feature is disabled, pass None so template shows form normally
+    enable_limit = os.getenv('ENABLE_REGISTRATION_LIMIT', '1')
+    enable_limit_bool = str(enable_limit).lower() not in ('0', 'false', 'no', 'off')
+    LIMIT = int(os.getenv('REGISTRATION_LIMIT', '30')) if enable_limit_bool else None
     return render_template("index.html", registrations_count=current_count, registrations_limit=LIMIT)
 
 

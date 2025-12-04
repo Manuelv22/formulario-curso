@@ -47,16 +47,23 @@
       <div class="card shadow-sm">
         <div class="card-body">
           <h3 class="mb-3">Formulario de inscripción</h3>
-          {% set remaining = registrations_limit - registrations_count %}
-          {% if registrations_count >= registrations_limit %}
-            <div class="alert alert-warning" role="alert">
-              Lo sentimos — ya se alcanzó el límite de {{ registrations_limit }} inscripciones. No se aceptan más inscripciones por ahora.
-            </div>
-            <p class="text-muted">Si quieres, contáctanos por WhatsApp para preguntar por lista de espera.</p>
-            <a class="btn btn-outline-primary" href="https://wa.me/56984575115?text=Consulta+sobre+lista+de+espera+curso+pa%C3%B1os+inmobiliarios">Contactar por WhatsApp</a>
+          {% if registrations_limit is not none %}
+            {% set remaining = registrations_limit - registrations_count %}
+            {% if registrations_count >= registrations_limit %}
+              <div class="alert alert-warning" role="alert">
+                Lo sentimos — ya se alcanzó el límite de {{ registrations_limit }} inscripciones. No se aceptan más inscripciones por ahora.
+              </div>
+              <p class="text-muted">Si quieres, contáctanos por WhatsApp para preguntar por lista de espera.</p>
+              <a class="btn btn-outline-primary" href="https://wa.me/56984575115?text=Consulta+sobre+lista+de_espera+curso+pa%C3%B1os+inmobiliarios">Contactar por WhatsApp</a>
+            {% else %}
+              <div id="form-errors"></div>
+              <form id="inscripcionForm" method="post" novalidate>
+          {% endif %}
           {% else %}
-          <div id="form-errors"></div>
-          <form id="inscripcionForm" method="post" novalidate>
+            {# No registration limit configured: show form normally #}
+            <div id="form-errors"></div>
+            <form id="inscripcionForm" method="post" novalidate>
+          {% endif %}
             <div class="row g-2">
               <div class="col-md-6">
                 <label class="form-label">Nombre</label>
@@ -127,7 +134,9 @@
               <button id="submitBtn" class="btn btn-primary btn-lg" type="submit">Enviar inscripción</button>
             </div>
           </form>
-          <div class="mt-3 text-muted">Quedan <strong>{{ remaining }}</strong> cupos disponibles.</div>
+          {% if registrations_limit is not none %}
+            <div class="mt-3 text-muted">Quedan <strong>{{ remaining }}</strong> cupos disponibles.</div>
+          {% endif %}
           {% endif %}
         </div>
       </div>
